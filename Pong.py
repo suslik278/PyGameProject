@@ -1,6 +1,15 @@
 import pygame
 import random
 
+BLACK = (0, 0, 0)
+GRAY = (200, 203, 200)
+
+pygame.init()
+pygame.display.set_caption('Pong')
+size = width, height = 800, 600
+screen = pygame.display.set_mode(size)
+
+
 class Ball(pygame.sprite.Sprite):
     def __init__(self, radius, x, y):
         super().__init__(all_sprites)
@@ -27,12 +36,12 @@ class Border(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         if x1 == x2:  # вертикальная стенка
             self.add(vertical_borders)
-            self.image = pygame.Surface([1, y2 - y1])
+            self.image = pygame.Surface([6, y2 - y1])
             self.image.fill([255, 255, 255])
             self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
         else:  # горизонтальная стенка
             self.add(horizontal_borders)
-            self.image = pygame.Surface([x2 - x1, 1])
+            self.image = pygame.Surface([x2 - x1, 6])
             self.image.fill([255, 255, 255])
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
@@ -54,20 +63,18 @@ class Pl2(pygame.sprite.Sprite):
         self.image.fill([255, 255, 255])
         self.rect = pygame.Rect(x1, y1, x2 - x1, y2 - y1)
 
+def draw():
+    pygame.draw.line(screen, GRAY, (400, 0), (400, 600), 5)
+
+
 
 if __name__ == '__main__':
-    pygame.init()
-    pygame.display.set_caption('Pong')
-    size = width, height = 800, 600
-    screen = pygame.display.set_mode(size)
     all_sprites = pygame.sprite.Group()
     horizontal_borders = pygame.sprite.Group()
     vertical_borders = pygame.sprite.Group()
-    Border(5, height - 5, width - 5, height - 5)
-    Border(5, 5, 50, height - 5)
-    Border(width - 5, 5, width - 5, height - 5)
+    Border(0, 100, 800, 100)
 
-    player = Pl(0, 400, 20, 600)
+    player = Pl(0, 200, 20, 400)
     player2 = Pl2(780, 400, 800, 600)
     for i in range(1):
         Ball(20, 100, 500)
@@ -88,9 +95,11 @@ if __name__ == '__main__':
                     player.rect.y -= 10
                 if event.key == pygame.K_s:
                     player.rect.y += 10
+        draw()
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
         all_sprites.update()
         clock.tick(fps)
+        draw()
         pygame.display.flip()
     pygame.quit()
