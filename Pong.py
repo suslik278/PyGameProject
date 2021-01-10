@@ -74,8 +74,8 @@ if __name__ == '__main__':
     vertical_borders = pygame.sprite.Group()
     Border(0, 100, 800, 100)
 
-    player = Pl(0, 200, 20, 400)
-    player2 = Pl2(780, 400, 800, 600)
+    player = Pl(0, 200, 20, 350)
+    player2 = Pl2(780, 200, 800, 350)
     for i in range(1):
         Ball(20, 100, 500)
     fps = 60
@@ -86,15 +86,14 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    player2.rect.y -= 10
-                if event.key == pygame.K_DOWN:
-                    player2.rect.y += 10
-                if event.key == pygame.K_w:
-                    player.rect.y -= 10
-                if event.key == pygame.K_s:
-                    player.rect.y += 10
+        if pygame.key.get_pressed()[pygame.K_w]:
+            player.rect.y -= 7
+        if pygame.key.get_pressed()[pygame.K_s]:
+            player.rect.y += 7
+        if pygame.key.get_pressed()[pygame.K_UP]:
+            player2.rect.y -= 7
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            player2.rect.y += 7
         draw()
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
