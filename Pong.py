@@ -76,7 +76,7 @@ if __name__ == '__main__':
     Border(5, height - 5, width - 5, height - 5)
     player = Pl(0, 200, 20, 350)
     player2 = Pl2(780, 200, 800, 350)
-    ball = Ball(13, 400, 300)
+    ball = Ball(12, 400, 300)
     score = 0
     score2 = 0
     for i in range(1):
