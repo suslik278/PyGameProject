@@ -80,14 +80,11 @@ if __name__ == '__main__':
     score = 0
     score2 = 0
     for i in range(1):
-        Ball(13, 400, 300)
+        ball
     fps = 60
     clock = pygame.time.Clock()
     running = True
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
         if ball.rect.x >= 800:
             ball.rect.x = 400
             ball.rect.y = 300
@@ -96,6 +93,9 @@ if __name__ == '__main__':
             ball.rect.x = 400
             ball.rect.y = 300
             score2 += 1
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
         if pygame.key.get_pressed()[pygame.K_w]:
             player.rect.y -= 7
             if player.rect.y < 99:
@@ -116,6 +116,11 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
         all_sprites.update()
+        font = pygame.font.Font(None, 85)
+        text = font.render(str(score), 1, (255, 255, 255))
+        screen.blit(text, (200, 25))
+        text = font.render(str(score2), 1, (255, 255, 255))
+        screen.blit(text, (600, 25))
         clock.tick(fps)
         draw()
         pygame.display.flip()
