@@ -19,8 +19,8 @@ class Ball(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, pygame.Color("white"),
                            (radius, radius), radius)
         self.rect = pygame.Rect(x, y, 2 * radius, 2 * radius)
-        self.vx = 1
-        self.vy = random.randrange(-30, 30)
+        self.vx = 4
+        self.vy = 5
 
     def update(self):
         self.rect = self.rect.move(self.vx, self.vy)
@@ -63,9 +63,9 @@ class Pl2(pygame.sprite.Sprite):
         self.image.fill([255, 255, 255])
         self.rect = pygame.Rect(x1, y1, x2 - x1, y2 - y1)
 
+
 def draw():
     pygame.draw.line(screen, GRAY, (400, 0), (400, 600), 5)
-
 
 
 if __name__ == '__main__':
@@ -73,27 +73,45 @@ if __name__ == '__main__':
     horizontal_borders = pygame.sprite.Group()
     vertical_borders = pygame.sprite.Group()
     Border(0, 100, 800, 100)
-
+    Border(5, height - 5, width - 5, height - 5)
     player = Pl(0, 200, 20, 350)
     player2 = Pl2(780, 200, 800, 350)
+    ball = Ball(13, 400, 300)
+    score = 0
+    score2 = 0
     for i in range(1):
-        Ball(20, 100, 500)
+        Ball(13, 400, 300)
     fps = 60
     clock = pygame.time.Clock()
-
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        if ball.rect.x >= 800:
+            ball.rect.x = 400
+            ball.rect.y = 300
+            score += 1
+        elif ball.rect.x <= 0:
+            ball.rect.x = 400
+            ball.rect.y = 300
+            score2 += 1
         if pygame.key.get_pressed()[pygame.K_w]:
             player.rect.y -= 7
+            if player.rect.y < 99:
+                player.rect.y = 100
         if pygame.key.get_pressed()[pygame.K_s]:
             player.rect.y += 7
+            if player.rect.y > 455:
+                player.rect.y = 455
         if pygame.key.get_pressed()[pygame.K_UP]:
             player2.rect.y -= 7
+            if player2.rect.y < 99:
+                player2.rect.y = 100
         if pygame.key.get_pressed()[pygame.K_DOWN]:
             player2.rect.y += 7
+            if player2.rect.y > 455:
+                player2.rect.y = 455
         draw()
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
