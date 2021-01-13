@@ -1,13 +1,141 @@
+import sys
+import os
 import pygame
-import random
+import pygame_gui
 
 BLACK = (0, 0, 0)
 GRAY = (200, 203, 200)
+
+score = 0
+score2 = 0
 
 pygame.init()
 pygame.display.set_caption('Pong')
 size = width, height = 800, 600
 screen = pygame.display.set_mode(size)
+fps = 60
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{name}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
+
+
+def start_screen():
+    """
+    Начальная заставка с кнопками
+    """
+    global score
+    global score2
+    manager = pygame_gui.UIManager((800, 600), os.path.join('data', 'menu_theme.json'))
+    # Кнопки
+    start_btn = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((800 // 2 - 75, 600 // 3 - 25), (150, 50)),
+        text='Начать игру',
+        manager=manager
+    )
+    exit_btn = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((800 // 2 - 75, 600 // 2 + 125), (150, 50)),
+        text='Выход',
+        manager=manager
+    )
+    back = load_image('fon.jpg')
+    screen.blit(back, (0, 0))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == start_btn:
+                        score = 0
+                        score2 = 0
+                        game()
+                    if event.ui_element == exit_btn:
+                        terminate()
+            manager.process_events(event)
+        manager.update(fps / 1000)
+        manager.draw_ui(screen)
+        pygame.display.flip()
+        clock.tick(fps)
+
+
+def finish_screen():
+    intro_text = ["Это",
+                  "Было",
+                  "Слишком лекго",
+                  "Игрок номер один",
+                  "Нажмите пробел чтобы вернуться в меню"]
+
+    fon = pygame.transform.scale(load_image('fon.jpg'), (800, 600))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('gray'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    start_screen()
+        pygame.display.flip()
+        clock.tick(fps)
+
+
+def finish_screen2():
+    intro_text = ["Вау",
+                  "Как ты смог ",
+                  "Победить",
+                  "Игрок номер два?",
+                  "Нажмите пробел чтобы вернуться в меню"]
+
+    fon = pygame.transform.scale(load_image('fon.jpg'), (800, 600))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('gray'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    start_screen()
+        pygame.display.flip()
+        clock.tick(fps)
 
 
 class Ball(pygame.sprite.Sprite):
@@ -68,34 +196,40 @@ def draw():
     pygame.draw.line(screen, GRAY, (400, 0), (400, 600), 5)
 
 
-if __name__ == '__main__':
-    all_sprites = pygame.sprite.Group()
-    horizontal_borders = pygame.sprite.Group()
-    vertical_borders = pygame.sprite.Group()
+def game():
+    global score
+    global score2
     Border(0, 100, 800, 100)
     Border(5, height - 5, width - 5, height - 5)
     player = Pl(0, 200, 20, 350)
     player2 = Pl2(780, 200, 800, 350)
     ball = Ball(12, 400, 300)
-    score = 0
-    score2 = 0
     for i in range(1):
         ball
-    fps = 60
-    clock = pygame.time.Clock()
     running = True
     while running:
         if ball.rect.x >= 800:
             ball.rect.x = 400
             ball.rect.y = 300
             score += 1
+            if score == 3:
+                player.kill()
+                player2.kill()
+                ball.kill()
+                finish_screen()
         elif ball.rect.x <= 0:
             ball.rect.x = 400
             ball.rect.y = 300
             score2 += 1
+            if score2 == 3:
+                player.kill()
+                player2.kill()
+                ball.kill()
+                finish_screen2()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                terminate()
         if pygame.key.get_pressed()[pygame.K_w]:
             player.rect.y -= 7
             if player.rect.y < 99:
@@ -124,4 +258,11 @@ if __name__ == '__main__':
         clock.tick(fps)
         draw()
         pygame.display.flip()
-    pygame.quit()
+
+
+clock = pygame.time.Clock()
+all_sprites = pygame.sprite.Group()
+horizontal_borders = pygame.sprite.Group()
+vertical_borders = pygame.sprite.Group()
+start_screen()
+pygame.quit()
