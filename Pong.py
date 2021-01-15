@@ -21,7 +21,7 @@ def terminate():
     sys.exit()
 
 
-def load_image(name, colorkey=None):
+def load_image(name, colorkey=None):  # загрузка изображения
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{name}' не найден")
@@ -37,7 +37,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-def start_screen():
+def start_screen():  # начальное меню
     """
     Начальная заставка с кнопками
     """
@@ -76,11 +76,11 @@ def start_screen():
         clock.tick(fps)
 
 
-def finish_screen():
+def finish_screen():  # экран победы для первого игрока
     intro_text = ["Это",
                   "Было",
                   "Слишком лекго",
-                  "Игрок номер один",
+                  "Игрок номер один, ты слишком силен",
                   "Нажмите пробел чтобы вернуться в меню"]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (800, 600))
@@ -107,7 +107,7 @@ def finish_screen():
         clock.tick(fps)
 
 
-def finish_screen2():
+def finish_screen2():  # экран победы для второго игрока
     intro_text = ["Вау",
                   "Как ты смог ",
                   "Победить",
@@ -138,7 +138,7 @@ def finish_screen2():
         clock.tick(fps)
 
 
-class Ball(pygame.sprite.Sprite):
+class Ball(pygame.sprite.Sprite):  # собственно шар
     def __init__(self, radius, x, y):
         super().__init__(all_sprites)
         self.radius = radius
@@ -149,13 +149,16 @@ class Ball(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x, y, 2 * radius, 2 * radius)
         self.vx = 4
         self.vy = 5
+        self.boom = pygame.mixer.Sound(os.path.join('data', 'ponk.wav'))  # звук столкновения
 
     def update(self):
         self.rect = self.rect.move(self.vx, self.vy)
         if pygame.sprite.spritecollideany(self, horizontal_borders):
             self.vy = -self.vy
+            self.boom.play()
         if pygame.sprite.spritecollideany(self, vertical_borders):
             self.vx = -self.vx
+            self.boom.play()
 
 
 class Border(pygame.sprite.Sprite):
@@ -174,7 +177,7 @@ class Border(pygame.sprite.Sprite):
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
 
-class Pl(pygame.sprite.Sprite):
+class Pl(pygame.sprite.Sprite):  # игрок номер один
     def __init__(self, x1, y1, x2, y2):
         super().__init__(all_sprites)
         self.add(vertical_borders)
@@ -183,7 +186,7 @@ class Pl(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x1, y1, x2 - x1, y2 - y1)
 
 
-class Pl2(pygame.sprite.Sprite):
+class Pl2(pygame.sprite.Sprite):  # игрок номер два
     def __init__(self, x1, y1, x2, y2):
         super().__init__(all_sprites)
         self.add(vertical_borders)
@@ -192,13 +195,14 @@ class Pl2(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x1, y1, x2 - x1, y2 - y1)
 
 
-def draw():
+def draw():  # рисование теннисной сетки
     pygame.draw.line(screen, GRAY, (400, 0), (400, 600), 5)
 
 
 def game():
     global score
     global score2
+    goal = pygame.mixer.Sound(os.path.join('data', 'prob.wav'))  # звук забивания гола
     Border(0, 100, 800, 100)
     Border(5, height - 5, width - 5, height - 5)
     player = Pl(0, 200, 20, 350)
@@ -212,6 +216,7 @@ def game():
             ball.rect.x = 400
             ball.rect.y = 300
             score += 1
+            goal.play()
             if score == 3:
                 player.kill()
                 player2.kill()
@@ -221,6 +226,7 @@ def game():
             ball.rect.x = 400
             ball.rect.y = 300
             score2 += 1
+            goal.play()
             if score2 == 3:
                 player.kill()
                 player2.kill()
